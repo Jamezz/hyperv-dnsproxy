@@ -12,6 +12,8 @@ namespace DnsProxy
 {
     public static class ServiceManager
     {
+        private static bool FORCE_IPV4 = true;
+
         #region Private variables
 
         private static readonly Dictionary<string, DnsServer> Servers = new Dictionary<string, DnsServer>();
@@ -184,8 +186,15 @@ namespace DnsProxy
                 // send query to upstream _servers
                 var question = message.Questions[0];
 
+                DnsClient client = DnsClient.Default;
+                if (FORCE_IPV4)
+                {
+                    var ipv4DnsServers = DnsClient.GetLocalConfiguredDnsServers().Where(a => a.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
+                    client = new DnsClient(ipv4DnsServers, 1000);
+                }
+
                 var upstreamResponse =
-                    await DnsClient.Default.ResolveAsync(question.Name, question.RecordType, question.RecordClass);
+                    await client.ResolveAsync(question.Name, question.RecordType, question.RecordClass);
 
                 // if got an answer, copy it to the message sent to the client
                 if (upstreamResponse != null)
