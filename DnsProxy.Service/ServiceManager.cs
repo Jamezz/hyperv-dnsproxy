@@ -192,7 +192,7 @@ namespace DnsProxy
                     Random rand = new Random();
                     var ipv4DnsServers = DnsClient.GetLocalConfiguredDnsServers().Where(a => a.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
                     var list = ipv4DnsServers.OrderBy(a => rand.Next()).ToList();
-                    client = new DnsClient(list, 1000);
+                    client = new DnsClient(list, DnsClient.Default.QueryTimeout);
                 }
 
                 var upstreamResponse =
