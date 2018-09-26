@@ -189,8 +189,10 @@ namespace DnsProxy
                 DnsClient client = DnsClient.Default;
                 if (FORCE_IPV4)
                 {
+                    Random rand = new Random();
                     var ipv4DnsServers = DnsClient.GetLocalConfiguredDnsServers().Where(a => a.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork);
-                    client = new DnsClient(ipv4DnsServers, 1000);
+                    var list = ipv4DnsServers.OrderBy(a => rand.Next()).ToList();
+                    client = new DnsClient(list, 1000);
                 }
 
                 var upstreamResponse =
